@@ -1,0 +1,23 @@
+body{
+    background-color: hsl(0, 0%, 0%);
+    color: white;
+    padding: 20px;
+}
+
+h1{
+    text-align: center;
+}
+
+img{
+    height: 300px;
+}
+.err{
+    height: 500px;
+}
+.err h1{
+    color: hsl(0, 100%, 50%);
+}
+.err span{
+    
+    color: white;
+}
