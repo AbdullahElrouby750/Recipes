@@ -160,9 +160,13 @@ myHttp.onload = function() {//triggered only after readyState  === 4
 
 
 const storedRecipes = localStorage.getItem("recipes") ? JSON.parse(localStorage.getItem("recipes")) : {};
-let firstVisit = true;
+let firstVisit = false;
 //displaying recommendation or pizza recipes if first visit as default
-Object.keys(storedRecipes).length === 0 ? searchForRecipe("pizza") : displayRecommendedRecipes();
+if(Object.keys(storedRecipes).length === 0){
+    firstVisit = true;
+    searchForRecipe("pizza");
+}
+else displayRecommendedRecipes();
 
 
 //Methods
@@ -227,6 +231,8 @@ function displayRecipe(recipe) {
 
 function addToLocalStorage(recipe, recipeCategory) {
     if (!storedRecipes.hasOwnProperty(recipeCategory)) {
+        console.log("from stor");
+        
         storedRecipes[recipeCategory] = recipe;
         localStorage.setItem("recipes", JSON.stringify(storedRecipes));
     }
@@ -268,6 +274,8 @@ select.addEventListener('change', (event) => {
 
         myHttp.onload = function () {
             if (this.status === 200) {
+                console.log("from select");
+                
                 const recipes = this.response.recipes;
                 addToLocalStorage(recipes, selectedRecipe);
                 displayRecipe(recipes);
