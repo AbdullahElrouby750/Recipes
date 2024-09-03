@@ -181,19 +181,23 @@ function searchForRecipe(query) {
     errMsg.classList.add("d-none")
 
     myHttp.onload = function () {
+        
         if (this.status === 200) {
             const recipes = this.response.recipes;
-            
+
             //!if the first visit dont add
-            if(Object.keys(storedRecipes).length !== 0 )addToLocalStorage(recipes, query);
-            
+            if (Object.keys(storedRecipes).length !== 0) addToLocalStorage(recipes, query);
+
             displayRecipe(recipes);
         }
-        else {
+        else{
 
+            cardsArea.innerHTML = "";
             notFoundTarget.textContent = query + "!";
             errMsg.classList.remove("d-none")
+            console.log("inside else", myHttp.status);
         }
+
     }
 
 }
