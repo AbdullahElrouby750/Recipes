@@ -187,7 +187,7 @@ function searchForRecipe(query) {
 
             //!if the first visit dont add
             if (!firstVisit) addToLocalStorage(recipes, query);
-
+            firstVisit = false;
             displayRecipe(recipes);
         }
         else{
