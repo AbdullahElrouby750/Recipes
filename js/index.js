@@ -162,7 +162,7 @@ myHttp.onload = function() {//triggered only after readyState  === 4
 const storedRecipes = localStorage.getItem("recipes") ? JSON.parse(localStorage.getItem("recipes")) : {};
 
 //displaying recommendation or pizza recipes if first visit as default
-storedRecipes.length === 0 ? searchForRecipe("pizza") : displayRecommendedRecipes();
+Object.keys(storedRecipes).length === 0 ? searchForRecipe("pizza") : displayRecommendedRecipes();
 
 
 //Methods
@@ -175,26 +175,25 @@ recipes.forEach(recipe => {
 
 function searchForRecipe(query) {
 
-    try {
-        myHttp.open('GET', `https://forkify-api.herokuapp.com/api/search?q=${query}`);
-        myHttp.send();
-        errMsg.classList.add("d-none")
 
-        if(myHttp.status !== 200){
-            throw new Error(`Error: ${myHttp.statusText}`);
-        }
-        myHttp.onload = function () {
-            if (this.status === 200) {
-                const recipes = this.response.recipes;
-                // console.log(recipes[0]);
-                addToLocalStorage(recipes, query);
-                displayRecipe(recipes);
-            }
-        }
-    } catch (error) {
+    myHttp.open('GET', `https://forkify-api.herokuapp.com/api/search?q=${query}`);
+    myHttp.send();
+    errMsg.classList.add("d-none")
 
-        notFoundTarget.tabIndex = query;
-        errMsg.classList.remove("d-none")
+    myHttp.onload = function () {
+        if (this.status === 200) {
+            const recipes = this.response.recipes;
+            
+            //!if the first visit dont add
+            if(Object.keys(storedRecipes).length !== 0 )addToLocalStorage(recipes, query);
+            
+            displayRecipe(recipes);
+        }
+        else {
+
+            notFoundTarget.textContent = query + "!";
+            errMsg.classList.remove("d-none")
+        }
     }
 
 }
