@@ -160,7 +160,7 @@ myHttp.onload = function() {//triggered only after readyState  === 4
 
 
 const storedRecipes = localStorage.getItem("recipes") ? JSON.parse(localStorage.getItem("recipes")) : {};
-
+let firstVisit = true;
 //displaying recommendation or pizza recipes if first visit as default
 Object.keys(storedRecipes).length === 0 ? searchForRecipe("pizza") : displayRecommendedRecipes();
 
@@ -186,7 +186,7 @@ function searchForRecipe(query) {
             const recipes = this.response.recipes;
 
             //!if the first visit dont add
-            if (Object.keys(storedRecipes).length !== 0) addToLocalStorage(recipes, query);
+            if (!firstVisit) addToLocalStorage(recipes, query);
 
             displayRecipe(recipes);
         }
