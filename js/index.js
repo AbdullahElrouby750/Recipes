@@ -134,40 +134,39 @@ onload and onreadystatechange are ready event listeners
 use if tracking requests states needed
 myHttp.onreadystatechange = function() { //triggered every readyState Change (4x)
 
-    if(this.readyState === 4 && this.status === 200) {
-        depends on responseType
-        if responseType = '' then return a string (like responsText)
-        no need to parse it if responseType = 'json'
-        console.log('response: ',this.response);
-        
-        
-        always string
-        wont work unless responseType = 'text' or ''
-        throw an error otherwise
-        console.log('responseText: ',JSON.parse(this.responseText));
-        
-        const recipe = JSON.parse(this.responseText).recipe;
-        console.log(recipe);
+if(this.readyState === 4 && this.status === 200) {
+    depends on responseType
+    if responseType = '' then return a string (like responsText)
+    no need to parse it if responseType = 'json'
+    console.log('response: ',this.response);
+    
+    
+    always string
+    wont work unless responseType = 'text' or ''
+    throw an error otherwise
+    console.log('responseText: ',JSON.parse(this.responseText));
+    
+    const recipe = JSON.parse(this.responseText).recipe;
+    console.log(recipe);
     }
-}
-
-myHttp.onload = function() {//triggered only after readyState  === 4
+    }
+    
+    myHttp.onload = function() {//triggered only after readyState  === 4
     if(this.status === 200) {
         const recipe = this.response.recipe;
         console.log(recipe);
-    }
-}*/
+        }
+        }*/
 
 
 const storedRecipes = localStorage.getItem("recipes") ? JSON.parse(localStorage.getItem("recipes")) : {};
 let firstVisit = false;
 //displaying recommendation or pizza recipes if first visit as default
-if(Object.keys(storedRecipes).length === 0){
+if (Object.keys(storedRecipes).length === 0) {
     firstVisit = true;
     searchForRecipe("pizza");
 }
 else displayRecommendedRecipes();
-
 
 //Methods
 recipes.forEach(recipe => {
@@ -179,13 +178,14 @@ recipes.forEach(recipe => {
 
 function searchForRecipe(query) {
 
+    errMsg.classList.add("d-none")
+    if (getPreCalledRecipes(query)) return;
 
     myHttp.open('GET', `https://forkify-api.herokuapp.com/api/search?q=${query}`);
     myHttp.send();
-    errMsg.classList.add("d-none")
 
     myHttp.onload = function () {
-        
+
         if (this.status === 200) {
             const recipes = this.response.recipes;
 
@@ -194,15 +194,20 @@ function searchForRecipe(query) {
             firstVisit = false;
             displayRecipe(recipes);
         }
-        else{
-
+        else {
             cardsArea.innerHTML = "";
             notFoundTarget.textContent = query + "!";
             errMsg.classList.remove("d-none")
             console.log("inside else", myHttp.status);
         }
-
     }
+}
+function getPreCalledRecipes(recipeTitle) {
+    if (Object.keys(storedRecipes).includes(recipeTitle)) {
+        displayRecipe(storedRecipes[recipeTitle]);
+        return true;
+    }
+    return false;
 
 }
 
@@ -229,14 +234,17 @@ function displayRecipe(recipe) {
 
 }
 
+//function to add to LocalStorage
 function addToLocalStorage(recipe, recipeCategory) {
     if (!storedRecipes.hasOwnProperty(recipeCategory)) {
         console.log("from stor");
-        
+
         storedRecipes[recipeCategory] = recipe;
         localStorage.setItem("recipes", JSON.stringify(storedRecipes));
     }
 }
+
+
 
 function displayRecommendedRecipes() {
 
@@ -269,16 +277,19 @@ select.addEventListener('change', (event) => {
     const selectedRecipe = event.target.value;
     if (selectedRecipe != "random") {
 
-        myHttp.open('GET', `https://forkify-api.herokuapp.com/api/search?q=${selectedRecipe}`);
-        myHttp.send();
+        if (!getPreCalledRecipes(selectedRecipe)) {
 
-        myHttp.onload = function () {
-            if (this.status === 200) {
-                console.log("from select");
-                
-                const recipes = this.response.recipes;
-                addToLocalStorage(recipes, selectedRecipe);
-                displayRecipe(recipes);
+            myHttp.open('GET', `https://forkify-api.herokuapp.com/api/search?q=${selectedRecipe}`);
+            myHttp.send();
+
+            myHttp.onload = function () {
+                if (this.status === 200) {
+                    console.log("from select");
+
+                    const recipes = this.response.recipes;
+                    addToLocalStorage(recipes, selectedRecipe);
+                    displayRecipe(recipes);
+                }
             }
         }
     }
